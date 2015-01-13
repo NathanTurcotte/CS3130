@@ -25,4 +25,4 @@ def geocode(address):
     print(raw_reply.decode('utf-8'))
 
 if __name__ == '__main__':
-    geocode('10726 106ave, grande prairie, AB, Can')
+    geocode('11215 63 str, edmonton, AB, CAN')
