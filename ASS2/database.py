@@ -1,25 +1,38 @@
 #!user/bin/python
 
+#Nathan Turcotte
+#CS3130 Assignement #2
+#Database interaction module
 
+#database file, if the file does not exist, it will be created
 databaseFile = "data.txt"
 
+# Returns a list of dictionaries from a file(name specified by databaseFile above)
 def ReadDataBase():
-    dictionaryList = []
+    data = []
     try:
         f = open(databaseFile, 'r')
-    except IOError:
-        return dictionaryList
+    except IOErro try:r:
+        return data
     
-    data = f.readlines()
-    for line in data:
-        AddRecord(line,dictionaryList)
+    contents = f.readlines()
+    for line in contents:
+        AddRecord(line,data)
     f.close()
-    return dictionaryList
+    return data
             
+#
+# Splits the given line into a dictionary.
+# Adds the dictionary to a list specified by the second argument
+# The line must contain exactly 4 elements
+# ID number must contain only digits
+# First name, last name and department must contain only alphabetical letters
+# The line is ignored if any of these conditions fail
+# 
 
-def AddRecord(line, dictionaryList):
-    tmp = line.strip()
-    tmp = tmp.split(':')
+def AddRecord(line, data):
+    line = line.strip()
+    tmp = line.split(':')
     valid = True
     if len(tmp) == 4:
         if tmp[0].isdigit() == False:
@@ -34,21 +47,30 @@ def AddRecord(line, dictionaryList):
         valid = False
     if valid:
         record = {'id':tmp[0] , 'fname':tmp[1], 'lname':tmp[2], 'dep':tmp[3]}
-        dictionaryList.append(record)
-
-def SaveDataBase(list):
+        data.append(record)
+#
+# Rewrites the file specified by databaseFile
+#
+def SaveDataBase(data):
     f = open(databaseFile, 'w')
-    for i in range(0,len(list)):
-        f.write(list[i]['id'])
+    for i in range(0,len(data)):
+        f.write(data[i]['id'])
         f.write(':')
-        f.write(list[i]['fname'])
+        f.write(data[i]['fname'])
         f.write(':')
-        f.write(list[i]['lname'])
+        f.write(data[i]['lname'])
         f.write(':')
-        f.write(list[i]['dep'])
+        f.write(data[i]['dep'])
         f.write('\n')
     f.close()
-    
+   
+#
+# Prompts user to enter appropriate fields to create an employee. 
+# Creates a proper dictionary with the given data
+# And adds it to a list passed as the parameter data
+# 
+# Also saves dictionaryList back to file using SaveDataBase(list)
+#
 def AddEmployee(data):
     valid = False
     try:
@@ -90,8 +112,15 @@ def AddEmployee(data):
         return
     rec = {'id' : id, 'fname' : fname, 'lname' : lname, 'dep' : dep}
     data.append(rec)
-    print("New Employee(", rec, ") successfully added!")
-    
+    print("New Employee successfully added!\n")
+    SaveDataBase(data)
+  
+#
+# Searches through the parameter data,
+# for a dictionary with id field equals to parameter id
+# returns index of the employee if they exist
+# returns -1 otherwise
+#  
 def EmployeeExist(data,id):
     exist = -1
     for l in range(0,len(data)):
@@ -100,6 +129,12 @@ def EmployeeExist(data,id):
             break
     return exist
 
+#
+# Prompts user for an ID number
+# Searches through parameter data
+# for the given employee.
+# If found, print the employees data
+#
 def FindEmployee(data):
     print("ID number : ", end="")
     try:
@@ -113,7 +148,31 @@ def FindEmployee(data):
         print("First name : ",data[index]['fname'])
         print("Last name : ",data[index]['lname'])
         print("Department : ",data[index]['dep'])
+    print("")
+#
+# Prompts user for an ID number
+# If the id exist, the employee will be removed
+#
+# Also saves dictionaryList back to file using SaveDataBase(list)
+#
+def RemoveEmployee(data):
+    print("ID number : ", end="")
+    try:
+        id = input()
+    except EOFError:
+        return
+    index = EmployeeExist(data,id)
+    if index == -1:
+        print("Employee ID does not exist")
+    else:
+        del data[index]
+        print("Employee successfully removed")
+        print("")
+    SaveDataBase(data)
 
+#
+# Display all the employees in the given list of dictionary
+#
 def DisplayEmployees(data):
     for i in range(0,len(data)):
         print("ID Number : ", data[i]['id'])
@@ -121,5 +180,6 @@ def DisplayEmployees(data):
         print("Last name : ",data[i]['lname'])
         print("Department : ",data[i]['dep'])
         print("")
+    print("")
         
 

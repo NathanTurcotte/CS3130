@@ -1,17 +1,21 @@
 #!/usr/bin/python
 import database
 
+#Nathan Turcotte
+#CS3130 Assignement#2
+#main
+
 MenuString = """
 --
 Employee FMS
-
+ try:
 Select one of the following:
   
   1) Add a new employee
   2) Search for an employee
   3) Remove an employee from FMS
   4) Display entire employee FMS
-  5) Quit
+  5) Quit(Save)
   
 --"""
 
@@ -29,15 +33,19 @@ def menu():
             print(MenuString)
             line = input()
             if line == '1':
+                print("\nAdd Employee to database")
                 database.AddEmployee(data)
                 EnterToContinue()
             elif line == '2':
+                print("\nSearch for employee")
                 database.FindEmployee(data)
                 EnterToContinue()
             elif line == '3':
-                print("Remove Employee")
+                print("\nRemove employee from database")
+                database.RemoveEmployee(data)
                 EnterToContinue()
             elif line == '4':
+                print("\nDisplay entire database")
                 database.DisplayEmployees(data)
                 EnterToContinue()
             elif line == '5':
