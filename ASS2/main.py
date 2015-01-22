@@ -2,7 +2,7 @@
 import database
 
 #Nathan Turcotte
-#CS3130 Assignement#2
+#CS3130 Assignement#1
 #main
 
 MenuString = """

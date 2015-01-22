@@ -1,7 +1,7 @@
 #!user/bin/python
 
 #Nathan Turcotte
-#CS3130 Assignement #2
+#CS3130 Assignement #1
 #Database interaction module
 
 #database file, if the file does not exist, it will be created

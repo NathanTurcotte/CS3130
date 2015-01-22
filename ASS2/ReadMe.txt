@@ -1,7 +1,7 @@
 Nathan Turcotte
 5027975
 CS3130
-Assignement 2
+Assignement 1
 	
 Located in Directory ASS2 of repository CS3130
 https://github.com/NathanTurcotte/CS3130
