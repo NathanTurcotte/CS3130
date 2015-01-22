@@ -1,5 +1,3 @@
-import string
-
 def readFile(fileName):
     try:
         file = open(fileName, 'r')
@@ -13,5 +11,5 @@ def readFile(fileName):
             c = c+contents[i] 
         else:
             c = c + " "  
-    c = c.split()
+    c = c.strip().split()
     print(c)
