@@ -10,6 +10,13 @@ OnLine = []
 Existing = ["Bob", "John"]
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+#Restrict access to the OnLine set
+onlineLock = threading.Lock()
+#Restrict access to sock
+sendLock = threading.Lock()
+#Restrict file io to one thread at a time
+fileLock = threading.Lock()
+
 class ExecuteQuery(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -33,7 +40,7 @@ class ExecuteQuery(threading.Thread):
                     reply = "Command Not Handled"
 
         else:
-            reply = "Unknown Error"
+            reply = "Unknown Command"
         Send(reply, address)
                              
             
@@ -48,7 +55,9 @@ def run (ip, port):
 
 def Send(data, address):
     reply = "(Server) " + data
+    sendLock.acquire()
     sock.sendto(reply.encode('ascii'), address)
+    sendLock.release()
 
 def ClientSignIn(text, address):
     tokens = text.split(' ')
@@ -75,55 +84,85 @@ def ClientHelp():
     return text
 
 def ClientSend(text,senderAddress):
+    """
+        Send message from Sender Address to the user designated in text(complete command)
+        Check if the sender is online. Ie is address is located in the OnLine set
+        Check if the receiver is exist and is online. 
+    """
+    onlineLock.acquire()
     tokens = text.split(' ')
+    #tokens[0] will contain the command, while tokens[1] will contain the receivers name
     message = ""
     if len(tokens) < 2:
+        onlineLock.release()
         return "Improper use of Send Command. Expected format : Send <username> <message>"
-    else:
-        message = tokens[1] + " : "
+    elif tokens[1] in Existing:
+        senderName = GetClientName(senderAddress)
+        if senderName == "":
+            onlineLock.release()
+            return "You must be signed in to send messages"
+        message = senderName + " : "
         for i in range(2, len(tokens)):
             message += tokens[i] + " "
-    if tokens[1] in Existing:
-        senderName = GetClientName(senderAddress)
+        
         if isOnline(tokens[1], 0):
             Found, receiverAddress = GetClientAddress(tokens[1])
             if Found:
                 Send(message, receiverAddress)
         else:         
-            message = tokens[1] + " is currently offline." + StoreClientMessage(tokens[1],message)
+            message = tokens[1] + " is currently offline. " + StoreClientMessage(tokens[1],message)
     else:
         message = tokens[1] + " Does not exist!"
-
+    onlineLock.release()
     return message
  
 
 def ClientSignOut(addr):
+    """
+        Signs out (remove entry from OnLine set) client at given address
+        Checks if a user is connected at the given address first
+    """
     found = -1
-    #get mutex lock on OnLine
+    reply = ""
+    onlineLock.acquire()
     for i in range(0,len(OnLine)):
         if OnLine[i][1] == addr:
             found = i
             break
     if (found != -1):
         del OnLine[found]
-        #release mutex
-        return "Sign Out successful!"  
+        reply = "Sign Out successful!"  
     else:
-        #release mutex
-        return "You can not Sign Out if you have not Signed In"
+        reply = "You can not Sign Out if you have not Signed In"
+    onlineLock.release()
+    return reply
 
 def StoreClientMessage(user, message):
+    """
+        Stores a message to an offline user
+        text in message must be of format
+        <sender> : <message>
+        new line character added by this function
+    """
+    fileLock.acquire()
+    reply = "Message successfully saved!"
     try:
         f = open("Clients/"+user, "a")
         f.write(message)
         f.write('\n')
         f.close()
     except IOError:
-        return("Error saving Message")
-    return "Message successfully saved!"
+        reply = "Error saving Message"
+    fileLock.release()
+    return reply
 
 def FetchFile(username):
+    """
+        Looks for existing messages sent to the user while offline
+        Message data is stored into the file exactly as it is suppose to be output
+    """
     messages = []
+    fileLock.acquire()
     try:
         f = open("Clients/"+username, 'r')
         lines = f.readlines()
@@ -140,28 +179,43 @@ def FetchFile(username):
     reply = "Welcome Back " + username + "! You have " + str(len(messages)) + " new message(s).\n"
     for i in range(0,len(messages)):
         reply += messages[i] 
+    fileLock.release()
     return reply
 
 def isOnline(name, address):
-    #get OnLine mutex
+    """
+        Returns True if the user with name is online
+        False otherwise
+    """
+    onlineLock.acquire()
     Found = False
     for i in range(0,len(OnLine)):
         if name == OnLine[i][0]:
             Found = True
-   #release
+    onlineLock.release()
     return Found
+
 def GetClientName(addr):
+    """
+        Returns the clients name at the given address
+        Returns "" if a match can not be made
+    """
     name = ""
-    #getonline mutex
+    onelineLock.acquire()
     for i in range(0,len(OnLine)):
         if addr == OnLine[i][1]:
             name = OnLine[i][0]
             break   
-    #release mutex
+    onlineLock.release()
     return name
 
 def GetClientAddress(username):
-    #get OnLine mutex
+    """
+        Get the address of a givne username
+        Returns Found, address
+        a valid address is only given if Found is set to true
+    """
+    onlineLock.acquire()
     Found = False
     addr = ""
     for i in range(0,len(OnLine)):
@@ -169,9 +223,12 @@ def GetClientAddress(username):
             addr = OnLine[i][1]
             Found = True
             break
-   #release
+    onlineLock.release()
     return Found, addr
 def setOnline(username, address):
-    #get mutex
+    """
+        Add a user with (username,address) to the OnLine set
+    """
+    onlineLock.acquire()
     OnLine.append([username, address])
-    #release mutex
+    onlineLock.release()
