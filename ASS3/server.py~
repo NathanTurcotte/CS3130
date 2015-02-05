@@ -1,0 +1,10 @@
+MAX_BYTES = 65535
+
+def run (ip, port):
+    sock = socket.socket((socket.AF_INET, socket.SOCK_DGRAM))
+    sock.bind((ip,port))
+    print("Server Listening at: ", sock.getsockname())
+    while True:
+        data, address = sock.recvfrom(MAX_BYTES)
+        text = data.decode('ascii')
+        print('The Client at {} says {!r}'.format(address,data))

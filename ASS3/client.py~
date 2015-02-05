@@ -1,0 +1,8 @@
+import socket
+
+def run (ip, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.connect((ip,port))
+    while True:
+        data = input()
+        sock.send(data.encode('ascii'))

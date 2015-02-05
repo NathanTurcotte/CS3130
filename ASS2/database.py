@@ -12,7 +12,7 @@ def ReadDataBase():
     data = []
     try:
         f = open(databaseFile, 'r')
-    except IOErro :
+    except IOError :
         return data
     
     contents = f.readlines()
