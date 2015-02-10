@@ -17,7 +17,9 @@ import re
 """
 
 def process(data):
-    #magic
+    """
+        determines if a number found in data is valid
+    """
     number = re.match(r'((\([\d]{3}\)[ ]{0,1}|[\d]{3} |[\d]{3}-)[\d]{3}[- ][\d]{4})|[\d]{10}', data, 0)
     if number:
         PrintNumber(number.group())
