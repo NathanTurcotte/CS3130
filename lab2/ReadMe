@@ -1,0 +1,18 @@
+Nathan Turcotte
+5027975
+CS3130
+Lab Assignement 2
+Located in Directory lab2 of repository CS3130
+https://github.com/NathanTurcotte/CS3130
+
+To execute :
+  python3 main.py
+Consist of one File
+  main.py
+The program will prompt the user to enter a phone number. Write your number then hit enter.
+Doing so will return a formatted phone number, or an error message if you did not give a 
+properly structured phone number.
+
+Accepted phone number formats :
+
+
