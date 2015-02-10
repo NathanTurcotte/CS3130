@@ -15,4 +15,14 @@ properly structured phone number.
 
 Accepted phone number formats :
 
+(xxx) xxx-xxxx
+(xxx) xxx xxxx
+(xxx)xxx-xxxx
+(xxx)xxx xxxx
+xxx-xxx-xxxx
+xxx xxx-xxxx
+xxx-xxx xxxx
+xxx xxx xxxx
+xxxxxxxxxx
+
 
