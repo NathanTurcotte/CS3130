@@ -11,7 +11,7 @@ Consist of one File
   main.py
 The program will prompt the user to enter a phone number. Write your number then hit enter.
 Doing so will return a formatted phone number, or an error message if you did not give a 
-properly structured phone number.
+properly structured phone number. Hitting enter without writing anything will terminate the program.
 
 Accepted phone number formats :
 
