@@ -5,13 +5,14 @@ import threading
 from threading import Thread
 import re
 
-Commands = ["SignIn", "WhoIsOn", "Send", "SignOut", "Help"]
+Commands = ["SignIn", "WhoIsOn", "Send", "SignOut", "Help", "WhoIsOn"]
 OnLine = []
-Existing = ["Bob", "John"]
+Existing = ["Bob", "John", "Nathan", "Franco"]
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 #Restrict access to the OnLine set
 onlineLock = threading.Lock()
+printLock = threading.Lock()
 #Restrict access to sock
 sendLock = threading.Lock()
 #Restrict file io to one thread at a time
@@ -21,6 +22,14 @@ class ExecuteQuery(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
     def run(self, data, address):
+        """
+            Performs the query
+            Data contains the entire text send by the user
+            Step 1 : determime which command was entered
+            Step 2 : call the appropriate function
+                     functions that require the text, are sent the complete message
+            Step 3 : The called functions will return the text that is to be sent back to the sender
+        """
         text = data.decode('ascii')
         reply = ""
         match = re.match("[a-zA-Z]+", text, 0)
@@ -30,12 +39,19 @@ class ExecuteQuery(threading.Thread):
             else:
                 if (match.group() == "SignIn"):
                     reply = ClientSignIn(text, address)
+                    Print("Sign In request from : " + str(address))
                 elif (match.group() == "Help"):
                     reply = ClientHelp()
+                    Print("Help request from : " + str(address))
                 elif (match.group() == "Send"):
                     reply = ClientSend(text, address)
+                    Print("Send request from : " + str(address))
                 elif (match.group() == "SignOut"):
                     reply = ClientSignOut(address)
+                    Print("Sign out request from : " + str(address))
+                elif (match.group() == "WhoIsOn"):
+                    reply = WhoIsOn()
+                    Print("WhoIsOn request from : " + str(address))
                 else:
                     reply = "Command Not Handled"
 
@@ -46,26 +62,62 @@ class ExecuteQuery(threading.Thread):
             
 
 def run (ip, port):
+    """
+        Continuously receive from socket
+        When a message is received, start a thread, passing the entire message and address
+        then continue listening
+    """
     sock.bind((ip,port))
     print("Server Listening at: ", sock.getsockname())
     while True:
         data, address = sock.recvfrom(MAX_BYTES)
         ExecuteQuery().run(data,address)  
 
-
+def Print(text):
+    """
+        Print text to server console
+        Uses printLock to prevent two threads from outputting text at the same time
+    """
+    printLock.acquire()
+    print(text)
+    printLock.release()
 def Send(data, address):
+    """
+        Send data(string format) to the given address
+        Uses sendLock to prevent multiple threads attempting to use sock simultaneously
+    """
     reply = "(Server) " + data
     sendLock.acquire()
     sock.sendto(reply.encode('ascii'), address)
     sendLock.release()
 
+def WhoIsOn():
+    """
+        Returns a string containing the username of online users
+    """
+    onlineLock.acquire()
+    reply = str(len(OnLine)) + " user(s) currently online\n"
+    for i in range(0,len(OnLine)):
+        reply += "  " + OnLine[i][0] +'\n'
+    onlineLock.release()
+    return reply
+        
+
 def ClientSignIn(text, address):
+    """
+        Attempts a client SignIn
+        text = entire message sent from client
+        address = clients address
+    """
     tokens = text.split(' ')
     if len(tokens) == 2:
         if tokens[1] not in Existing:
             return "User: " + tokens[1] + ". Does Not Exist."
-        if isOnline(tokens[1], address):
+        onlineTag = isOnline(tokens[1], address)
+        if onlineTag == 1:
             return "User: " + tokens[1] + ". Is allready Signed in"
+        if onlineTag == 2:
+            return "Multiple Signins from one client detected"
         setOnline(tokens[1], address)
         return FetchFile(tokens[1])
         
@@ -73,6 +125,9 @@ def ClientSignIn(text, address):
         return "Improper SignIn information. Expected format : SignIn <username>"
 
 def ClientHelp():
+    """
+        Return help message
+    """
     text  = "Welcome to MMS!\n"
     text += "--"
     text += "The following Commands are supported\n"
@@ -89,22 +144,19 @@ def ClientSend(text,senderAddress):
         Check if the sender is online. Ie is address is located in the OnLine set
         Check if the receiver is exist and is online. 
     """
-    onlineLock.acquire()
     tokens = text.split(' ')
     #tokens[0] will contain the command, while tokens[1] will contain the receivers name
     message = ""
     if len(tokens) < 2:
-        onlineLock.release()
         return "Improper use of Send Command. Expected format : Send <username> <message>"
     elif tokens[1] in Existing:
         senderName = GetClientName(senderAddress)
         if senderName == "":
-            onlineLock.release()
             return "You must be signed in to send messages"
         message = senderName + " : "
+        #put the message back together, tokens[2] and beyond contain the actual text
         for i in range(2, len(tokens)):
             message += tokens[i] + " "
-        
         if isOnline(tokens[1], 0):
             Found, receiverAddress = GetClientAddress(tokens[1])
             if Found:
@@ -113,7 +165,6 @@ def ClientSend(text,senderAddress):
             message = tokens[1] + " is currently offline. " + StoreClientMessage(tokens[1],message)
     else:
         message = tokens[1] + " Does not exist!"
-    onlineLock.release()
     return message
  
 
@@ -176,22 +227,25 @@ def FetchFile(username):
     finally:    
         s = open("Clients/"+username, 'w')
         s.close()
+        fileLock.release()
     reply = "Welcome Back " + username + "! You have " + str(len(messages)) + " new message(s).\n"
     for i in range(0,len(messages)):
         reply += messages[i] 
-    fileLock.release()
     return reply
 
 def isOnline(name, address):
     """
-        Returns True if the user with name is online
-        False otherwise
+        Returns 1 if the user with name is online
+        Returns 2 of the user with address(ip,port) is online
+        0 otherwise
     """
     onlineLock.acquire()
-    Found = False
+    Found = 0
     for i in range(0,len(OnLine)):
         if name == OnLine[i][0]:
-            Found = True
+            Found = 1
+        if address == OnLine[i][1]:
+            Found = 2
     onlineLock.release()
     return Found
 
@@ -201,7 +255,7 @@ def GetClientName(addr):
         Returns "" if a match can not be made
     """
     name = ""
-    onelineLock.acquire()
+    onlineLock.acquire()
     for i in range(0,len(OnLine)):
         if addr == OnLine[i][1]:
             name = OnLine[i][0]
