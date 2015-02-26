@@ -36,6 +36,8 @@ Client Protocol :
             -RemoveEmployee request : "remove:id:;"
             -DisplayEmployee request : "display:;"
     -Messages received are to be decoded, then printed as is.
+    -Employee Id can contain any number of digits 0-9
+    -First name, last name, department can contain any number of characters a-zA-Z
 
 Server Protocol :
     -The server listens for connections
