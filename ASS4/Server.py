@@ -4,9 +4,13 @@ import socket
 import ra
 import database
 
-data = database.ReadDataBase()
+
 
 def server(host, port) :
+    """
+        Bind and listen on socket
+    """
+    data = database.ReadDataBase()
     mess = "hello from server;"   
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
@@ -14,20 +18,31 @@ def server(host, port) :
     sock.listen(1)
     print('Listening at : ', sock.getsockname)
     while True:
-        sc, sockname = sock.accept()
-        print('Connection accepted')
+        try:
+            sc, sockname = sock.accept()
+            print('Connection accepted')
+        except socket.error:
+            print("Error accepting Connection")
         message = ra.receiveMessage(sc)
         if message is None:
             print("Error Receiving message")
             sc.close()
             continue
         print("Message received from client : ", message)
-        message = execute(message) + ";"
+        message = execute(data,message) + ";"
         print("Sending back : ", message)
-        sc.sendall(message.encode('ascii'))
+        try:
+            sc.sendall(message.encode('ascii'))
+        except socket.error as e:
+            print("Error Sending Message ", e)
         sc.close()
         
-def execute(message):
+def execute(data,message):
+    """
+        Take the string received from the Client
+        Split the string on ':'
+        Call the appropriate database function which returns a string to be sent back to the client
+    """
     tokens = message.split(':')
     if not tokens:
         return "Invalid Query"

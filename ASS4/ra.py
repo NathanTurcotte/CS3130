@@ -6,8 +6,10 @@ import time
 timeout = 3
 
 def receiveMessage(sock):
-    data = b''
-    
+    """
+        Receive Message. All messages end with a ;
+    """
+    data = b'' 
     try:
         while True:
             sock.settimeout(timeout)
@@ -18,3 +20,6 @@ def receiveMessage(sock):
                 data += more
     except socket.timeout:
         return None
+    except socket.error:
+        return None
+        

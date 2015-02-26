@@ -3,6 +3,12 @@
 Nathan Turcotte
 CS3130 Assignement #4
 Server Database interaction module
+
+Functions that attemp to execute client queries
+    addEmployee, removeEmployee, findEmployee, displayEmployees
+usually require two parameters
+data : dabase list
+tokens : client request split into a list. "find:52:" -> ["find",52]
 """
 #database file, if the file does not exist, it will be created
 databaseFile = "data.txt"
@@ -64,9 +70,7 @@ def SaveDataBase(data):
         f.write('\n')
     f.close()
    
-#
-# Prompts user to enter appropriate fields to create an employee. 
-# Creates a proper dictionary with the given data
+# Creates dictionary with fields found in tokens
 # And adds it to a list passed as the parameter data
 # 
 # Also saves dictionaryList back to file using SaveDataBase(list)
@@ -119,8 +123,8 @@ def EmployeeExist(data,id):
     return exist
 
 #
-# Prompts user for an ID number
-# Searches through parameter data
+# P
+# Searches through parameter data, for employee with id of tokens[1]
 # for the given employee.
 # If found, print the employees data
 #
@@ -134,7 +138,7 @@ def FindEmployee(data, tokens):
         return "First name : " + data[index]['fname'] + "\nLast name : " + data[index]['lname'] + "\nDepartment : " + data[index]['dep']
 
 #
-# Prompts user for an ID number
+# Attempts to remove employee with id tokens[1]
 # If the id exist, the employee will be removed
 #
 # Also saves dictionaryList back to file using SaveDataBase(list)

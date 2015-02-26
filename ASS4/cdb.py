@@ -2,6 +2,7 @@
     The functions of this Module collect data from the user.
     Format the data into a list
         ["<action>", <element1>, <element2>, <elementn>]
+    then return the list
 """
 
 def AddEmployee():
@@ -46,6 +47,9 @@ def AddEmployee():
     return  ["add", id, fname, lname, dep]
 
 def FindEmployee():
+    """
+        prompts user for id number
+    """
     print("ID number : ", end="")
     try:
         id = input()
@@ -54,6 +58,9 @@ def FindEmployee():
     return ["find", id]
 
 def RemoveEmployee():
+    """
+        prompts user for id number
+    """
     print("ID number : ", end="")
     try:
         id = input()
