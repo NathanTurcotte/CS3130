@@ -151,9 +151,8 @@ def RemoveEmployee(data, tokens):
         return "Employee ID does not exist"
     else:
         del data[index]
-        SaveDataBase(data)
         return "Employee Successfully Removed"
-    
+    SaveDataBase(data)
 
 #
 # Display all the employees in the given list of dictionary
