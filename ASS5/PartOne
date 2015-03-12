@@ -1,0 +1,12 @@
+The Command
+    ssh -L <local port>:<local host>:<target port> <target host>
+allows a secure communication between client and host.
+Assuming
+    1) the Server is listening on <target host> at <target port>
+    2) the Client connects to <local host> at <local port>
+    3) "AllowTcpForwarding true" is set in /etc/ssh/sshd_config
+
+Example:
+    ssh -L 12345:localhost:2015 localhost
+        Server running on localhost port 2015
+        Client connects to localhost port 12345

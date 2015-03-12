@@ -1,7 +1,6 @@
 2:n:t:s
 123:n:t:s
 5027975:nathan:turcotte:science
-55:franco:carlacci:science
 12355:n:t:sc
 12:nathan:turcotte:science
 123445:nathan:turcotte:arts
