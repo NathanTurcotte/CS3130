@@ -19,10 +19,10 @@ Select one of the following :
 
 """
 def extract(data):
-"""
-    Receives entire html text from webpage
-    Extracts required values into a list of list
-"""
+    """
+        Receives entire html text from webpage
+        Extracts required values into a list of list
+    """
     #Find all div's/span's with needed values
     value = re.findall("prominent less-prominent(.*?)</div>", data)
     change = re.findall("<div class=\"change\">(.*?)</div>",data)
@@ -51,6 +51,9 @@ def extract(data):
     
 
 def display(index, key):
+    """
+        print list elements, index(int) indicates type
+    """
     string = ""
     if (index == 0) :
         string =   "S&P TSX"
@@ -89,12 +92,15 @@ def pressEnter():
 def main():
     r = requests.get(WEBSITE)
     values = extract(r.text)
-    while True:
+    keepon = True
+    while keepon == True:
         print(MENUSTRING)
         x = input()
         if (x.isdigit()):
             if int(x) > 0 and int(x) < 8:
                 display(int(x)-1, values[int(x)-1])
+            elif int(x) == 8:
+                keepon = False
         pressEnter()
 if __name__ == "__main__":
     main()
