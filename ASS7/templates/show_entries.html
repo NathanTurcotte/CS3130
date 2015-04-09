@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}  
+  <ul class=entries>
+  {% for entry in entries %}
+    <li><h2> ID : {{ entry.ID }}</h2> {{ entry.fname|safe }} {{ entry.lname|safe }} {{ entry.department|safe }}
+  {% else %}
+    <li><em>No employees to display</em>
+  {% endfor %}
+  {% endif %}
+  </ul>
+{% endblock %}

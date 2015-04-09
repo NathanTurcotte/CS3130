@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <dt>ID:
+        <dd><input type=text size=5 name=id>
+        <dt>First Name:
+        <dd><input type=text name=fname size=26></textarea>
+        <dt>Last Name:
+        <dd><input name=lname size=26></textarea>
+        <dt>Department:
+        <dd><input name=department size=26></textarea>
+        <dd><input type=submit value=Submit>
+      </dl>
+    </form>
+  
+  <ul class=entries>
+  {% endif %}
+  </ul>
+{% endblock %}
