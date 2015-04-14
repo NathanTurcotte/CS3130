@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}  
+  <ul class=entries>
+      
+      {% for entry in entries %}
+        <form action="{{ url_for('remove') }}" method=post class=add-entry>
+            <li> <input type=submit value="Remove"> <input type="hidden" value = "{{ entry.ID }}">
+            <h2> ID : {{ entry.ID }}</h2> {{ entry.fname|safe }} {{ entry.lname|safe }} {{ entry.department|safe }}
+        </form>
+      {% else %}
+        <li><em>No employees to display</em>
+      {% endfor %}
+      
+  {% endif %}
+  </ul>
+{% endblock %}

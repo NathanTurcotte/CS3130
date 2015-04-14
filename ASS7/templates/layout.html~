@@ -12,8 +12,7 @@
   {% endif %}
   </div>
   {% for category,message in get_flashed_messages(with_categories=true) %}
-    {% if category == 'error' %} <p class=error><strong>Error:</strong> {{ message }}
-    {% else %} <div class=flash>{{ message }}</div> {% endif %}
+    <div class=flash>{{ message }}</div>
   {% endfor %}
   {% block body %}{% endblock %}
 </div>
