@@ -18,6 +18,8 @@ To Execute :
     Log in using 
         username : default
         password : admin
+    Access using a web browser and the given address, in my case 127.0.0.1:5000
+    Note : You may need to add /login to the address to be redirected to a proper page
 
 Uses the Flask framework to provide an html gui and sqlite server to the Employee Management system
 
