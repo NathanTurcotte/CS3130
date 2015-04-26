@@ -1,0 +1,39 @@
+<!doctype html>
+<title>Messaging System</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=leftbar>
+  
+  {% if not session.logged_in %}
+    <div class=metanav><a href="{{ url_for('createAccount') }}"> Create Account </a> </div>
+    <div class=metanav><a href="{{ url_for('findFriend') }}">log in</a></div>
+    
+  {% else %}
+    <div class=metanav><a href="{{ url_for('logout') }}">log out</a> </div>
+    <div class=metanav><a href="{{ url_for('findFriend') }}"> Add Friend </a></div>
+    <div class=metanav> <h2> Friends </h2> </div>
+    <form action="{{ url_for('chooseConversation') }}" method=post>
+        <div class='metanav'>
+        <select name="friends">
+    {% for entry in entries %}
+        
+        <option value={{ entry.friend|safe }}> {{ entry.friend|safe }} </option>
+    {% endfor %}
+        </select>
+        </div>
+        <div class='metanav' ><input type="submit" value="Submit"></div>
+    </form>
+    {% if session.conversation != "" %}
+        <div class=metanav><a href="{{ url_for('refreshConversation') }}"> Refresh </a></div>
+    {% endif %}
+  {% endif %}
+  
+</div>
+<div class=page>
+  <h1> Messaging System </h1>
+
+  {% for category,message in get_flashed_messages(with_categories=true) %}
+    {% if category == 'error' %} <p class=error><strong>Error:</strong> {{ message }}
+    {% else %} <div class=flash>{{ message }}</div> {% endif %}
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

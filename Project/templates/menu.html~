@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+   <!-- message displaying routine
+        messages are located in list named messages
+        if the message sender attribute(m.s) matches the session username, then the 
+        message belongs to the client, otherwise, the message belongs to the receiver
+   -->
+   {% if messages %}  
+    <h2> You are currently talking with {{ messages[0].r }} </h2>   
+    {% for m in messages %}
+        {% if m.s == session.username %}
+            <h1 class="self"> {{ m.m }} </h1>
+        {% else %}
+            <h1 class="other"> {{ m.m }} </h1>
+        {%endif%}
+        
+    {% endfor %}
+   {% endif %}
+    {% if session.conversation != "" %}
+        <!-- Only display message input box if the current user is in a conversation
+                determined by comparrint the conversation session varialbe to ""        
+        -->
+        <form action="{{ url_for('sendMessage') }}" method=post>
+            <input type=text name=message></input>
+            <input type=submit value=Create>
+        </form>
+    {% else %}
+        <h2 class=metanav>Select or add a friend to continue</h2>
+    {% endif %}
+
+{% endblock %}

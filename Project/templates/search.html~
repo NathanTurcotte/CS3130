@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+    <form action="{{ url_for('search') }}" method=post class=add-entry>
+      <dl>
+        <dt> Employee Search :
+        <dt>    ID:
+        <dd><input type=text size=5 name=ID>
+
+        <dd><input type=submit value=Submit>
+      </dl>
+    </form>
+  
+  <ul class=entries>
+
+  {% endif %}
+  </ul>
+{% endblock %}
